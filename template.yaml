@@ -1,9 +1,6 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  tvq-sam
-
-  Sample SAM Template for tvq-sam
+Description: SAM Template for tvq-sam
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -11,29 +8,62 @@ Globals:
     Timeout: 3
 
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  # ==========================
+  # Global
+  # ==========================
+  MetaTable:
+    Type: AWS::Serverless::SimpleTable
+  MetaDynamodbRole:
+    Type: AWS::IAM::Role
     Properties:
-      CodeUri: hello_world/
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: dynamodbAccessRole
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${MetaTable}"
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: "*"
+  # TODO:
+  # ACM Certificate
+  # APIGW Custom domain link
+  # Output:
+  # - Cname Cloudflare
+  # - API Gateway domain name
+
+  # ==========================
+  # App CV Visitor (CV)
+  # ==========================
+  CVFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cv_visitor/
       Handler: app.lambda_handler
       Runtime: python3.8
+      Role: !GetAtt MetaDynamodbRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref MetaTable
       Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        VisitorCounter:
+          Type: Api
           Properties:
-            Path: /hello
+            Path: /cv/visitors
             Method: get
-
-Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
