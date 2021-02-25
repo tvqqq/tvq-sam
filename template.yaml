@@ -102,6 +102,3 @@ Resources:
             Method: get
             RestApiId:
               Ref: ApiGatewayApi
-
-Output:
-  
