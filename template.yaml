@@ -7,12 +7,21 @@ Globals:
   Function:
     Timeout: 3
 
+Parameters:
+  TvqDomain:
+    Type: String
+    Default: tatviquyen.name.vn
+
 Resources:
   # ==========================
   # Global
   # ==========================
+
+  # Global Meta Table in DynamoDB
   MetaTable:
     Type: AWS::Serverless::SimpleTable
+
+  # Role for access Meta Table
   MetaDynamodbRole:
     Type: AWS::IAM::Role
     Properties:
@@ -41,12 +50,36 @@ Resources:
                 Action:
                   - logs:*
                 Resource: "*"
-  # TODO:
+
   # ACM Certificate
+  TvqCert:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      ValidationMethod: DNS
+      DomainName: !Sub "*.${TvqDomain}"
+
+  # Register Apigw
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
   # APIGW Custom domain link
-  # Output:
-  # - Cname Cloudflare
-  # - API Gateway domain name
+  ApiGatewayCustomDomain:
+    Type: AWS::ApiGatewayV2::DomainName
+    Properties:
+      DomainName: !Sub "sam.${TvqDomain}"
+      DomainNameConfigurations:
+        - EndpointType: REGIONAL
+          CertificateArn: !Ref TvqCert
+
+  ApiGatewayMapping:
+    Type: AWS::ApiGatewayV2::ApiMapping
+    DependsOn: TvqCert
+    Properties:
+      ApiId: !Ref ApiGatewayApi
+      DomainName: !Ref ApiGatewayCustomDomain
+      Stage: Prod
 
   # ==========================
   # App CV Visitor (CV)
@@ -67,3 +100,8 @@ Resources:
           Properties:
             Path: /cv/visitors
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+
+Output:
+  
