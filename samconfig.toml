@@ -8,4 +8,4 @@ s3_prefix = "tvq-sam"
 region = "ap-southeast-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "TvqDomain=\"tatviquyen.name.vn\""
+parameter_overrides = "TvqDomain=\"tatviquyen.name.vn\" TvqUsCertArn=\"arn:aws:acm:us-east-1:292519000107:certificate/5bd344ee-6574-4b17-a990-6cb29c39f521\""

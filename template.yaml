@@ -12,6 +12,9 @@ Parameters:
     Type: String
     Default: tatviquyen.name.vn
 
+  TvqUsCertArn:
+    Type: String
+
 Resources:
   # ==========================
   # Global
@@ -80,6 +83,63 @@ Resources:
       ApiId: !Ref ApiGatewayApi
       DomainName: !Ref ApiGatewayCustomDomain
       Stage: Prod
+
+  # ==========================
+  # Vue App
+  # ==========================
+  VueBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+
+  VueBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:aws:s3:::${VueBucket}/*"
+      Bucket: !Ref VueBucket
+
+  VueCloudFront:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        HttpVersion: http2
+        DefaultRootObject: index.html
+        Aliases:
+          - !Sub "vue.${TvqDomain}"
+        Origins:
+          - DomainName: !GetAtt VueBucket.RegionalDomainName
+            Id: s3Origin
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+          TargetOriginId: s3Origin
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: allow-all
+        ViewerCertificate:
+          AcmCertificateArn: !Ref TvqUsCertArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2019
 
   # ==========================
   # App CV Visitor (CV)
