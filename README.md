@@ -123,7 +123,20 @@ See the [AWS SAM developer guide](https://docs.aws.amazon.com/serverless-applica
 Next, you can use AWS Serverless Application Repository to deploy ready to use Apps that go beyond hello world samples and learn how authors developed their applications: [AWS Serverless Application Repository main page](https://aws.amazon.com/serverless/serverlessrepo/)
 
 ## Quyen Notes:
+0. Python venv
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+
 1. Running local invoke
 ```
 sam local invoke SpotifyFunction --env-vars spotify/env.json
+```
+
+2. Deploy
+```
+export AWS_PROFILE=tvqhub
+sam build
+sam deploy [--guide]
 ```

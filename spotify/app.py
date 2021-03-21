@@ -1,7 +1,6 @@
 import boto3
 import json
 import os
-import urllib.parse
 import urllib3
 import time
 
@@ -67,10 +66,24 @@ def lambda_handler(event, context):
     # Return result
     result = {
         'playing': response_current_playing['is_playing'],
-        'song': response_current_playing['item']['name'] if response_current_playing['is_playing'] else None
+        'song': None,
+        'artist': None,
+        'url': None
     }
+    if response_current_playing['is_playing']:
+        item = response_current_playing['item']
+        result.update({
+            'song': item['name'],
+            'artist': item['artists'][0]['name'],
+            'url': item['external_urls']['spotify']
+        })
+
     return {
         'isBase64Encoded': False,
         'statusCode': 200,
-        'body': json.dumps(result)
+        'body': json.dumps(result),
+        'headers': {
+            # TODO: only one origin domain is allow, set it by env
+            'Access-Control-Allow-Origin': 'https://tatviquyen.name.vn'
+        },
     }
