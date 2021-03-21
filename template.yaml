@@ -162,3 +162,25 @@ Resources:
             Method: get
             RestApiId:
               Ref: ApiGatewayApi
+
+  # ==========================
+  # App Spotify
+  # ==========================
+  SpotifyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: spotify/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Role: !GetAtt MetaDynamodbRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref MetaTable
+      Events:
+        SpotifyPlaying:
+          Type: Api
+          Properties:
+            Path: /spotify/playing
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
