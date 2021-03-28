@@ -134,7 +134,11 @@ source venv/bin/activate
 - Run Docker
 - Remove folder .aws-sam/build for auto-updating code
 ```
-sam local invoke SpotifyFunction --env-vars spotify/env.json
+sam build --parallel && sam local invoke FbFriendFunction --env-vars env.json --skip-pull-image
+```
+or running in Quyen's Mac
+```
+samrevoke FbFriend
 ```
 
 2. Deploy

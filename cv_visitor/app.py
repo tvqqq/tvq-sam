@@ -1,15 +1,12 @@
 import boto3
 import json
 import os
+import layer
 
 
 def lambda_handler(event, context):
     # Init DynamoDB Client
-    if os.getenv("AWS_SAM_LOCAL"):
-        dynamodb = boto3.resource(
-            'dynamodb', endpoint_url="http://host.docker.internal:8001")
-    else:
-        dynamodb = boto3.resource('dynamodb')
+    dynamodb = layer.ddb()
 
     # Set dynamodb table name variable from env
     table = dynamodb.Table(os.getenv('META_TABLE'))

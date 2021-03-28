@@ -3,17 +3,14 @@ import json
 import os
 import urllib3
 import time
+import layer
 from boto3.dynamodb.conditions import Attr
 
 
 def lambda_handler(event, context):
     client_sns = boto3.client('sns')
 
-    if os.getenv('AWS_SAM_LOCAL'):
-        dynamodb = boto3.resource(
-            'dynamodb', endpoint_url='http://host.docker.internal:8001')
-    else:
-        dynamodb = boto3.resource('dynamodb')
+    dynamodb = layer.ddb()
 
     # Get access token from DynamoDB
     table_meta = dynamodb.Table(os.getenv('META_TABLE'))
@@ -37,9 +34,12 @@ def lambda_handler(event, context):
 
     current_fb_friends = table_fb_friends.scan(
         ProjectionExpression='fb_id',
-        FilterExpression="attribute_not_exists(unf_at)"
+        FilterExpression="unf_at = :val",
+        ExpressionAttributeValues={
+            ':val': 0
+        }
     )
-    current_fb_friends_ids = pluck(current_fb_friends['Items'], 'fb_id')
+    current_fb_friends_ids = layer.pluck(current_fb_friends['Items'], 'fb_id')
 
     # Call API get list updated FB friends
     new_fb_friends_response = call_fb_graph(
@@ -50,11 +50,12 @@ def lambda_handler(event, context):
         new_fb_friends_ids.append(f['id'])
         table_fb_friends.update_item(
             Key={'fb_id': f['id']},
-            UpdateExpression='SET fb_name = :fb_name, fb_gender = :fb_gender, fb_avatar = :fb_avatar',
+            UpdateExpression='SET fb_name = :fb_name, fb_gender = :fb_gender, fb_avatar = :fb_avatar, unf_at = :unf_at',
             ExpressionAttributeValues={
                 ':fb_name': f['name'],
                 ':fb_gender': f['gender'] if 'gender' in f else None,
-                ':fb_avatar': f['picture']['data']['url'] if 'picture' in f else None
+                ':fb_avatar': f['picture']['data']['url'] if 'picture' in f else None,
+                ':unf_at': 0
             },
             ReturnValues='NONE'
         )
@@ -99,8 +100,3 @@ def call_fb_graph(access_token, node, edges='', fields='', limit=1):
         fields + '&limit=' + str(limit)
     request = http.request('GET', url)
     return json.loads(request.data)
-
-
-# TODO: Move to file common function
-def pluck(lst, key):
-    return [x.get(key) for x in lst]

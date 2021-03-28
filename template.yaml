@@ -6,6 +6,13 @@ Description: SAM Template for tvq-sam
 Globals:
   Function:
     Timeout: 3
+    Handler: app.lambda_handler
+    Runtime: python3.8
+    Environment:
+      Variables:
+        META_TABLE: !Ref MetaTable
+    Layers:
+      - !Ref PythonLayer
 
 Parameters:
   TvqDomain:
@@ -19,6 +26,16 @@ Resources:
   # ==========================
   # Global
   # ==========================
+
+  # Lambda Layer
+  PythonLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: python_layer
+      CompatibleRuntimes:
+        - python3.8
+    Metadata:
+      BuildMethod: python3.8
 
   # Global Meta Table in DynamoDB
   MetaTable:
@@ -156,12 +173,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cv_visitor/
-      Handler: app.lambda_handler
-      Runtime: python3.8
       Role: !GetAtt LambdaRole.Arn
-      Environment:
-        Variables:
-          META_TABLE: !Ref MetaTable
       Events:
         VisitorCounter:
           Type: Api
@@ -178,12 +190,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: spotify/
-      Handler: app.lambda_handler
-      Runtime: python3.8
       Role: !GetAtt LambdaRole.Arn
-      Environment:
-        Variables:
-          META_TABLE: !Ref MetaTable
       Events:
         SpotifyPlaying:
           Type: Api
@@ -210,13 +217,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: fb_friends/
-      Handler: app.lambda_handler
-      Runtime: python3.8
       Timeout: 900
       Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
-          META_TABLE: !Ref MetaTable
           FB_FRIEND_TABLE: !Ref FbFriendTable
           SNS_TOPIC: !Ref SnsTopic
       Events:
