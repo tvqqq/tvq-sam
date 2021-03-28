@@ -130,6 +130,9 @@ source venv/bin/activate
 ```
 
 1. Running local invoke
+**Note:**
+- Run Docker
+- Remove folder .aws-sam/build for auto-updating code
 ```
 sam local invoke SpotifyFunction --env-vars spotify/env.json
 ```

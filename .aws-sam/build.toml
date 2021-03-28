@@ -15,4 +15,11 @@ source_md5 = ""
 packagetype = "Zip"
 functions = ["SpotifyFunction"]
 
+[function_build_definitions.7f0229a7-ee0b-403b-81ab-59af754520a9]
+codeuri = "fb_friends/"
+runtime = "python3.8"
+source_md5 = ""
+packagetype = "Zip"
+functions = ["FbFriendFunction"]
+
 [layer_build_definitions]

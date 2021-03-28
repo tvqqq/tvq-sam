@@ -23,9 +23,13 @@ Resources:
   # Global Meta Table in DynamoDB
   MetaTable:
     Type: AWS::Serverless::SimpleTable
+    Properties:
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
-  # Role for access Meta Table
-  MetaDynamodbRole:
+  # Role for all Lambda functions
+  LambdaRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -39,19 +43,15 @@ Resources:
               - sts:AssumeRole
       Path: "/"
       Policies:
-        - PolicyName: dynamodbAccessRole
+        - PolicyName: lambdaAccessRole
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
-                  - dynamodb:GetItem
-                  - dynamodb:PutItem
-                  - dynamodb:UpdateItem
-                Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${MetaTable}"
-              - Effect: Allow
-                Action:
+                  - dynamodb:*
                   - logs:*
+                  - sns:*
                 Resource: "*"
 
   # ACM Certificate
@@ -83,6 +83,14 @@ Resources:
       ApiId: !Ref ApiGatewayApi
       DomainName: !Ref ApiGatewayCustomDomain
       Stage: Prod
+
+  # SNS
+  SnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint: "tvq9612@gmail.com"
+          Protocol: "email"
 
   # ==========================
   # Vue App
@@ -150,7 +158,7 @@ Resources:
       CodeUri: cv_visitor/
       Handler: app.lambda_handler
       Runtime: python3.8
-      Role: !GetAtt MetaDynamodbRole.Arn
+      Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
           TABLE_NAME: !Ref MetaTable
@@ -172,7 +180,7 @@ Resources:
       CodeUri: spotify/
       Handler: app.lambda_handler
       Runtime: python3.8
-      Role: !GetAtt MetaDynamodbRole.Arn
+      Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
           TABLE_NAME: !Ref MetaTable
@@ -184,3 +192,35 @@ Resources:
             Method: get
             RestApiId:
               Ref: ApiGatewayApi
+
+  # ==========================
+  # App FB Friend
+  # ==========================
+  FbFriendTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      PrimaryKey:
+        Name: fb_id
+        Type: String
+
+  FbFriendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fb_friends/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Timeout: 900
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref MetaTable
+          FB_FRIEND_TABLE: !Ref FbFriendTable
+          SNS_TOPIC: !Ref SnsTopic
+      Events:
+        FbFriendCronJob:
+          Type: Schedule
+          Properties:
+            Schedule: cron(00 15 * * ? *) # 22h UTC+7
