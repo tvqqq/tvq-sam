@@ -43,7 +43,7 @@ def lambda_handler(event, context):
 
     # Call API get list updated FB friends
     new_fb_friends_response = call_fb_graph(
-        access_token, 'me', 'friends', 'name,picture.width(2048){url},gender&pretty=0', 5)
+        access_token, 'me', 'friends', 'name,picture.width(2048){url},gender&pretty=0', 5000)
 
     new_fb_friends_ids = []
     for f in new_fb_friends_response['data']:
