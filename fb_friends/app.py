@@ -16,7 +16,7 @@ def lambda_handler(event, context):
         dynamodb = boto3.resource('dynamodb')
 
     # Get access token from DynamoDB
-    table_meta = dynamodb.Table(os.getenv('TABLE_NAME'))
+    table_meta = dynamodb.Table(os.getenv('META_TABLE'))
     facebook = table_meta.get_item(
         Key={'id': 'facebook'}
     )

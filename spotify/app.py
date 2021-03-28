@@ -17,7 +17,7 @@ def lambda_handler(event, context):
         dynamodb = boto3.resource('dynamodb')
 
     # Set dynamodb table name variable from env
-    table = dynamodb.Table(os.getenv('TABLE_NAME'))
+    table = dynamodb.Table(os.getenv('META_TABLE'))
     # Check access token is expired
     spotify = table.get_item(
         Key={'id': 'spotify'}

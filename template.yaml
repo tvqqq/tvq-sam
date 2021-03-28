@@ -161,7 +161,7 @@ Resources:
       Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
-          TABLE_NAME: !Ref MetaTable
+          META_TABLE: !Ref MetaTable
       Events:
         VisitorCounter:
           Type: Api
@@ -183,7 +183,7 @@ Resources:
       Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
-          TABLE_NAME: !Ref MetaTable
+          META_TABLE: !Ref MetaTable
       Events:
         SpotifyPlaying:
           Type: Api
@@ -216,7 +216,7 @@ Resources:
       Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
-          TABLE_NAME: !Ref MetaTable
+          META_TABLE: !Ref MetaTable
           FB_FRIEND_TABLE: !Ref FbFriendTable
           SNS_TOPIC: !Ref SnsTopic
       Events:
