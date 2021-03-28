@@ -130,13 +130,14 @@ source venv/bin/activate
 ```
 
 1. Running local invoke
+
 **Note:**
 - Run Docker
-- Remove folder .aws-sam/build for auto-updating code
+- If not use Lambda Layer: Remove folder .aws-sam/build for auto-updating code
 ```
 sam build --parallel && sam local invoke FbFriendFunction --env-vars env.json --skip-pull-image
 ```
-or running in Quyen's Mac
+or run this shorthand command (on Quyen's Mac)
 ```
 samrevoke FbFriend
 ```
