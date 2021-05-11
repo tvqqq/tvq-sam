@@ -83,6 +83,10 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
 
   # APIGW Custom domain link
   ApiGatewayCustomDomain:
