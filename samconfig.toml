@@ -3,9 +3,9 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 stack_name = "tvq-sam"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-s4a7bxkophjs"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-13nwo77dfd4xg"
 s3_prefix = "tvq-sam"
 region = "ap-southeast-1"
-confirm_changeset = true
+confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "TvqDomain=\"tatviquyen.name.vn\" TvqUsCertArn=\"arn:aws:acm:us-east-1:292519000107:certificate/5bd344ee-6574-4b17-a990-6cb29c39f521\""
+parameter_overrides = "TvqDomain=\"tatviquyen.name.vn\" TvqUsCertArn=\"arn:aws:acm:us-east-1:067783583101:certificate/cd6e12e8-f186-47bf-b0e5-47cc85cfd4bb\""

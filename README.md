@@ -146,5 +146,5 @@ samrevoke FbFriend
 ```
 export AWS_PROFILE=tvqhub
 sam build
-sam deploy [--guide]
+sam deploy [--guided]
 ```

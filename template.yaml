@@ -92,7 +92,7 @@ Resources:
   ApiGatewayCustomDomain:
     Type: AWS::ApiGatewayV2::DomainName
     Properties:
-      DomainName: !Sub "sam.${TvqDomain}"
+      DomainName: !Sub "sam2.${TvqDomain}"
       DomainNameConfigurations:
         - EndpointType: REGIONAL
           CertificateArn: !Ref TvqCert
@@ -116,59 +116,59 @@ Resources:
   # ==========================
   # Vue App
   # ==========================
-  VueBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      AccessControl: PublicRead
-      WebsiteConfiguration:
-        IndexDocument: index.html
+  # VueBucket:
+  #   Type: AWS::S3::Bucket
+  #   Properties:
+  #     AccessControl: PublicRead
+  #     WebsiteConfiguration:
+  #       IndexDocument: index.html
 
-  VueBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Sid: PublicReadForGetBucketObjects
-            Effect: Allow
-            Principal: "*"
-            Action: "s3:GetObject"
-            Resource: !Sub "arn:aws:s3:::${VueBucket}/*"
-      Bucket: !Ref VueBucket
+  # VueBucketPolicy:
+  #   Type: AWS::S3::BucketPolicy
+  #   Properties:
+  #     PolicyDocument:
+  #       Version: 2012-10-17
+  #       Statement:
+  #         - Sid: PublicReadForGetBucketObjects
+  #           Effect: Allow
+  #           Principal: "*"
+  #           Action: "s3:GetObject"
+  #           Resource: !Sub "arn:aws:s3:::${VueBucket}/*"
+  #     Bucket: !Ref VueBucket
 
-  VueCloudFront:
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Enabled: true
-        HttpVersion: http2
-        DefaultRootObject: index.html
-        Aliases:
-          - !Sub "vue.${TvqDomain}"
-        Origins:
-          - DomainName: !GetAtt VueBucket.RegionalDomainName
-            Id: s3Origin
-            CustomOriginConfig:
-              OriginProtocolPolicy: https-only
-        DefaultCacheBehavior:
-          AllowedMethods:
-            - DELETE
-            - GET
-            - HEAD
-            - OPTIONS
-            - PATCH
-            - POST
-            - PUT
-          TargetOriginId: s3Origin
-          ForwardedValues:
-            QueryString: true
-            Cookies:
-              Forward: none
-          ViewerProtocolPolicy: allow-all
-        ViewerCertificate:
-          AcmCertificateArn: !Ref TvqUsCertArn
-          SslSupportMethod: sni-only
-          MinimumProtocolVersion: TLSv1.2_2019
+  # VueCloudFront:
+  #   Type: AWS::CloudFront::Distribution
+  #   Properties:
+  #     DistributionConfig:
+  #       Enabled: true
+  #       HttpVersion: http2
+  #       DefaultRootObject: index.html
+  #       Aliases:
+  #         - !Sub "vue.${TvqDomain}"
+  #       Origins:
+  #         - DomainName: !GetAtt VueBucket.RegionalDomainName
+  #           Id: s3Origin
+  #           CustomOriginConfig:
+  #             OriginProtocolPolicy: https-only
+  #       DefaultCacheBehavior:
+  #         AllowedMethods:
+  #           - DELETE
+  #           - GET
+  #           - HEAD
+  #           - OPTIONS
+  #           - PATCH
+  #           - POST
+  #           - PUT
+  #         TargetOriginId: s3Origin
+  #         ForwardedValues:
+  #           QueryString: true
+  #           Cookies:
+  #             Forward: none
+  #         ViewerProtocolPolicy: allow-all
+  #       ViewerCertificate:
+  #         AcmCertificateArn: !Ref TvqUsCertArn
+  #         SslSupportMethod: sni-only
+  #         MinimumProtocolVersion: TLSv1.2_2019
 
   # ==========================
   # App CV Visitor (CV)
