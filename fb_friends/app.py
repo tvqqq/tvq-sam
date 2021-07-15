@@ -28,6 +28,7 @@ def lambda_handler(event, context):
             Subject='#TVQSAM x FB_Friend: Expired access token',
             Message='🔥 ALERT: Your Facebook access token is expired!'
         )
+        return False
 
     # Get list current FB friends
     table_fb_friends = dynamodb.Table(os.getenv('FB_FRIEND_TABLE'))
