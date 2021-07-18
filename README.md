@@ -129,7 +129,9 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-1. Running local invoke
+1. Copy `env.example.json` to `env.json`
+
+2. Running local invoke
 
 **Note:**
 - Run Docker
@@ -142,9 +144,9 @@ or run this shorthand command (on Quyen's Mac)
 samrevoke FbFriend
 ```
 
-2. Deploy
+3. Deploy
 ```
-export AWS_PROFILE=tvqhub
+export AWS_PROFILE=abc
 sam build
 sam deploy [--guided]
 ```
