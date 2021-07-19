@@ -13,3 +13,7 @@ def ddb():
 
 def pluck(lst, key):
     return [x.get(key) for x in lst]
+
+
+def logger(val):
+    print('\x1b[6;30;42m' + str(val) + '\x1b[0m')

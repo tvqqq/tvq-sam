@@ -1,0 +1,13 @@
+GET http://127.0.0.1:3000/fb-friends/list
+
+###
+GET http://127.0.0.1:3000/fb-friends/list?next=100002255295122
+
+###
+GET http://127.0.0.1:3000/fb-friends/settings
+
+###
+POST http://127.0.0.1:3000/fb-friends/settings
+content-type: application/json
+
+{"access_token":"12345556555433"}

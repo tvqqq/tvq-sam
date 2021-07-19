@@ -232,3 +232,57 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: cron(00 15 * * ? *) # 22h UTC+7
+
+  FbFriendListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fb_friends/
+      Role: !GetAtt LambdaRole.Arn
+      Handler: list.lambda_handler
+      Environment:
+        Variables:
+          FB_FRIEND_TABLE: !Ref FbFriendTable
+      Events:
+        FbFriendListApi:
+          Type: Api
+          Properties:
+            Path: /fb-friends/list
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+
+  FbFriendGetSettingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fb_friends/
+      Role: !GetAtt LambdaRole.Arn
+      Handler: settings.get
+      Environment:
+        Variables:
+          META_TABLE: !Ref MetaTable
+      Events:
+        FbFriendListApi:
+          Type: Api
+          Properties:
+            Path: /fb-friends/settings
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+
+  FbFriendPostSettingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fb_friends/
+      Role: !GetAtt LambdaRole.Arn
+      Handler: settings.post
+      Environment:
+        Variables:
+          META_TABLE: !Ref MetaTable
+      Events:
+        FbFriendListApi:
+          Type: Api
+          Properties:
+            Path: /fb-friends/settings
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi

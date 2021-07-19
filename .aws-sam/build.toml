@@ -20,7 +20,7 @@ codeuri = "fb_friends/"
 runtime = "python3.8"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["FbFriendFunction"]
+functions = ["FbFriendFunction", "FbFriendListFunction"]
 
 [layer_build_definitions]
 [layer_build_definitions.83a0c4a2-0ab9-446f-b63f-0a7f1a3614bf]
