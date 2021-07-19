@@ -33,8 +33,7 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps(result, cls=DecimalEncoder),
         'headers': {
-            # 'https://react-fb-friends.vercel.app'
-            'Access-Control-Allow-Origin': 'http://localhost:5000'
+            'Access-Control-Allow-Origin': 'http://localhost:5000' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
         },
     }
 

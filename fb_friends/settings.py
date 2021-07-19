@@ -22,8 +22,7 @@ def get(event, context):
         'statusCode': 200,
         'body': json.dumps(facebook),
         'headers': {
-            # 'https://react-fb-friends.vercel.app'
-            'Access-Control-Allow-Origin': 'http://localhost:5000'
+            'Access-Control-Allow-Origin': 'http://localhost:5000' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
         },
     }
 
@@ -50,7 +49,6 @@ def post(event, context):
         'statusCode': 200,
         'body': json.dumps(result),
         'headers': {
-            # 'https://react-fb-friends.vercel.app'
-            'Access-Control-Allow-Origin': 'http://localhost:5000'
+            'Access-Control-Allow-Origin': 'http://localhost:5000' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
         },
     }
