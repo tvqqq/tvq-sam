@@ -23,12 +23,20 @@ def lambda_handler(event, context):
     # If access token is revoked, send an email alert
     me = call_fb_graph(access_token, 'me')
     if 'name' not in me:
-        client_sns.publish(
-            TopicArn=os.getenv('SNS_TOPIC'),
-            Subject='#TVQSAM x FB_Friend: Expired access token',
-            Message='🔥 ALERT: Your Facebook access token is expired!'
+        if 'httpMethod' not in event:
+            client_sns.publish(
+                TopicArn=os.getenv('SNS_TOPIC'),
+                Subject='#TVQSAM x FB_Friend: Expired access token',
+                Message='🔥 ALERT: Your Facebook access token is expired!'
         )
-        return False
+        return {
+            'isBase64Encoded': False,
+            'statusCode': 200,
+            'body': json.dumps({'success': False, 'message': 'Expired access token'}),
+            'headers': {
+                'Access-Control-Allow-Origin': 'http://localhost:5000' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
+            },
+        }
 
     # Get list current FB friends
     table_fb_friends = dynamodb.Table(os.getenv('FB_FRIEND_TABLE'))
@@ -91,7 +99,14 @@ def lambda_handler(event, context):
             Message='🔥 ALERT: There are some unfriends today\n' + unfriend_str
         )
 
-    return True
+    return {
+        'isBase64Encoded': False,
+        'statusCode': 200,
+        'body': json.dumps({'success': True}),
+        'headers': {
+            'Access-Control-Allow-Origin': 'http://localhost:5000' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
+        },
+    }
 
 
 def call_fb_graph(access_token, node, edges='', fields='', limit=1):
