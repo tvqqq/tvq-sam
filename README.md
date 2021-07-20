@@ -152,7 +152,7 @@ source venv/bin/activate
     ```
   - Run `nodemon` to watch the file
     ```
-    nodemon --exec "sam build FbFriendListFunction" --watch ./fb_friends/list.py
+    nodemon --exec "sam build" --watch ./fb_friends/list.py
     ```
   - Open another command to run `sam local`
     ```

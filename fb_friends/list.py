@@ -19,6 +19,23 @@ def lambda_handler(event, context):
             '{"fb_id": "' + query['next'] + '"}')
         response = table_fb_friends.scan(
             Limit=LIMIT, ExclusiveStartKey=exclusiveStartKey)
+    elif query is not None and 'unf' in query:
+        response = table_fb_friends.scan(
+            FilterExpression=Attr("unf_at").ne(0))
+    elif query is not None and 'search' in query:
+        search = query['search']
+        kwargs = {
+            'FilterExpression': 'contains(#fb_name, :val) or contains(#fb_id, :val)',
+            'ExpressionAttributeNames': {
+                '#fb_name': 'fb_name',
+                '#fb_id': 'fb_id',
+            },
+            'ExpressionAttributeValues': {
+                ':val': search,
+            },
+        }
+        response = table_fb_friends.scan(**kwargs)
+
     else:
         # Initial request
         response = table_fb_friends.scan(Limit=LIMIT)
