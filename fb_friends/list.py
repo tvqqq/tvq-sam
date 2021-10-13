@@ -3,6 +3,7 @@ import os
 import layer
 from boto3.dynamodb.conditions import Attr
 import decimal
+import urllib.parse
 
 
 def lambda_handler(event, context):
@@ -15,8 +16,7 @@ def lambda_handler(event, context):
     # There is a next record
     query = event['queryStringParameters']
     if query is not None and 'next' in query:
-        exclusiveStartKey = json.loads(
-            '{"fb_id": "' + query['next'] + '"}')
+        exclusiveStartKey = json.loads(urllib.parse.unquote(query['next']))
         response = table_fb_friends.query(**{
             'Limit': LIMIT,
             'KeyConditionExpression': 'unf_at = :unf_at',
@@ -25,10 +25,12 @@ def lambda_handler(event, context):
             },
             'IndexName': 'unf_at-created_at-index',
             'ScanIndexForward': False,
-            'ExclusiveStartKey': exclusiveStartKey
+            'ExclusiveStartKey': {
+                'unf_at': 0,
+                'fb_id': exclusiveStartKey['fb_id'],
+                'created_at': int(exclusiveStartKey['created_at'])
+            }
         })
-        # response = table_fb_friends.scan(
-        #     Limit=LIMIT, ExclusiveStartKey=exclusiveStartKey)
     elif query is not None and 'unf' in query:
         response = table_fb_friends.scan(
             FilterExpression=Attr("unf_at").ne(0))
