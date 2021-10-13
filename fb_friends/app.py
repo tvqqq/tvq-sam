@@ -34,7 +34,7 @@ def lambda_handler(event, context):
             'statusCode': 200,
             'body': json.dumps({'success': False, 'message': 'Expired access token'}),
             'headers': {
-                'Access-Control-Allow-Origin': 'http://localhost:5000' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
+                'Access-Control-Allow-Origin': 'http://localhost:3001' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
             },
         }
 
@@ -66,6 +66,17 @@ def lambda_handler(event, context):
                 ':fb_avatar': f['picture']['data']['url'] if 'picture' in f else None,
                 ':unf_at': 0
             },
+            ReturnValues='NONE'
+        )
+
+        # Add the first timestamp added
+        table_fb_friends.update_item(
+            Key={'fb_id': f['id']},
+            UpdateExpression='SET created_at = :created_at',
+            ExpressionAttributeValues={
+                ':created_at': int(time.time())
+            },
+            ConditionExpression='attribute_not_exists(created_at)',
             ReturnValues='NONE'
         )
 
@@ -104,7 +115,7 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps({'success': True}),
         'headers': {
-            'Access-Control-Allow-Origin': 'http://localhost:5000' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
+            'Access-Control-Allow-Origin': 'http://localhost:3001' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
         },
     }
 

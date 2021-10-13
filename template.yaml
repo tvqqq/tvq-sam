@@ -208,14 +208,33 @@ Resources:
   # App FB Friend
   # ==========================
   FbFriendTable:
-    Type: AWS::Serverless::SimpleTable
+    Type: AWS::DynamoDB::Table
     Properties:
+      AttributeDefinitions:
+        - AttributeName: "fb_id"
+          AttributeType: "S"
+        - AttributeName: "unf_at"
+          AttributeType: "N"
+        - AttributeName: "created_at"
+          AttributeType: "N"
+      KeySchema:
+        - AttributeName: "fb_id"
+          KeyType: "HASH"
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-      PrimaryKey:
-        Name: fb_id
-        Type: String
+      GlobalSecondaryIndexes:
+        - IndexName: "unf_at-created_at-index"
+          KeySchema:
+            - AttributeName: "unf_at"
+              KeyType: "HASH"
+            - AttributeName: "created_at"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
 
   FbFriendFunction:
     Type: AWS::Serverless::Function

@@ -17,8 +17,18 @@ def lambda_handler(event, context):
     if query is not None and 'next' in query:
         exclusiveStartKey = json.loads(
             '{"fb_id": "' + query['next'] + '"}')
-        response = table_fb_friends.scan(
-            Limit=LIMIT, ExclusiveStartKey=exclusiveStartKey)
+        response = table_fb_friends.query(**{
+            'Limit': LIMIT,
+            'KeyConditionExpression': 'unf_at = :unf_at',
+            'ExpressionAttributeValues': {
+                ':unf_at': 0,
+            },
+            'IndexName': 'unf_at-created_at-index',
+            'ScanIndexForward': False,
+            'ExclusiveStartKey': exclusiveStartKey
+        })
+        # response = table_fb_friends.scan(
+        #     Limit=LIMIT, ExclusiveStartKey=exclusiveStartKey)
     elif query is not None and 'unf' in query:
         response = table_fb_friends.scan(
             FilterExpression=Attr("unf_at").ne(0))
@@ -38,7 +48,15 @@ def lambda_handler(event, context):
 
     else:
         # Initial request
-        response = table_fb_friends.scan(Limit=LIMIT)
+        response = table_fb_friends.query(**{
+            'Limit': LIMIT,
+            'KeyConditionExpression': 'unf_at = :unf_at',
+            'ExpressionAttributeValues': {
+                ':unf_at': 0,
+            },
+            'IndexName': 'unf_at-created_at-index',
+            'ScanIndexForward': False,
+        })
 
     result = {
         'data': response['Items'],
@@ -50,7 +68,7 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps(result, cls=DecimalEncoder),
         'headers': {
-            'Access-Control-Allow-Origin': 'http://localhost:5000' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
+            'Access-Control-Allow-Origin': 'http://localhost:3001' if os.getenv("AWS_SAM_LOCAL") else 'https://react-fb-manager.vercel.app'
         },
     }
 
