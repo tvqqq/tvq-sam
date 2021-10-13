@@ -62,7 +62,7 @@ def lambda_handler(event, context):
 
     result = {
         'data': response['Items'],
-        'next': response.get('LastEvaluatedKey', {}).get('fb_id')
+        'next': response.get('LastEvaluatedKey', {})
     }
 
     return {
