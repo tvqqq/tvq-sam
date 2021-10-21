@@ -69,16 +69,19 @@ def lambda_handler(event, context):
             ReturnValues='NONE'
         )
 
-        # Add the first timestamp added
-        table_fb_friends.update_item(
-            Key={'fb_id': f['id']},
-            UpdateExpression='SET created_at = :created_at',
-            ExpressionAttributeValues={
-                ':created_at': int(time.time())
-            },
-            ConditionExpression='attribute_not_exists(created_at)',
-            ReturnValues='NONE'
-        )
+        try:
+            # Add the first timestamp added
+            table_fb_friends.update_item(
+                Key={'fb_id': f['id']},
+                UpdateExpression='SET created_at = :created_at',
+                ExpressionAttributeValues={
+                    ':created_at': int(time.time())
+                },
+                ConditionExpression='attribute_not_exists(created_at)',
+                ReturnValues='NONE'
+            )
+        except Exception:
+            pass
 
     # Compare and detect unfriended
     # Existed in current but not in new
